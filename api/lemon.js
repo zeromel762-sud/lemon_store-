@@ -1,7 +1,15 @@
 const crypto = require("crypto");
 
-const URL_ = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-const TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+function findEnv(suffix) {
+  const direct = process.env["UPSTASH_REDIS_REST_" + suffix] || process.env["KV_REST_API_" + suffix];
+  if (direct) return direct;
+  const k = Object.keys(process.env).find(
+    (n) => (n.endsWith("REST_API_" + suffix) || n.endsWith("REDIS_REST_" + suffix)) && process.env[n]
+  );
+  return k ? process.env[k] : undefined;
+}
+const URL_ = findEnv("URL");
+const TOKEN = findEnv("TOKEN");
 const SECRET = process.env.AUTH_SECRET || TOKEN || "change-me";
 const APPS = "lemon:apps";
 const CFG = "lemon:cfg";
